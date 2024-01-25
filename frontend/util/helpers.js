@@ -23,9 +23,11 @@ export const getTaskStatus = (status) => {
       return '';
   }
 };
+
 export function shortenAddress(address, chars = 4) {
   return `${address.substring(0, chars)}...${address.substring(address.length - chars)}`;
 }
+
 export function isMoreThan3Days(now) {
   const nowDate = new Date(now);
 
@@ -475,3 +477,14 @@ export function formatDateCurrent(date) {
   const options = { month: 'short', day: 'numeric', year: 'numeric' };
   return new Date(Number(date)).toLocaleDateString('en-US', options);
 }
+
+export const generateUint8Array = str => {
+  const encoder = new TextEncoder('utf-8');
+  const encodedString = encoder.encode(str);
+
+  const uint8Array = new Uint8Array(32);
+
+  uint8Array.set(encodedString.slice(0, 32));
+
+  return uint8Array;
+};

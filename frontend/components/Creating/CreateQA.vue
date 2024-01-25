@@ -501,7 +501,7 @@ const check = async () => {
   loading.value = true;
 
   try {
-    statusMessage.value = 'Loading images...';
+    statusMessage.value = 'Loading files...';
     await loadImages();
 
     statusMessage.value = 'Loading data...';

@@ -2,21 +2,19 @@ import { defineStore } from 'pinia';
 import { HttpAgent } from '@dfinity/agent';
 import { Ed25519KeyIdentity } from '@dfinity/identity';
 import { AssetManager } from '@dfinity/assets';
+import { generateUint8Array } from '@/util/helpers';
 
 export const useAssetsStore = defineStore('assets', {
   id: 'assets',
   state: () => {
     return {
-      actor: null,
       assetManager: null,
-      identity: null,
     };
   },
   actions: {
     async init() {
-      // This is temporary solution for authorizing assets canister: 535yc-uxytb-gfk7h-tny7p-vjkoe-i4krp-3qmcl-uqfgr-cpgej-yqtjq-rqe
-      const identity = Ed25519KeyIdentity.generate(new Uint8Array(Array.from({ length: 32 }).fill(0)));
-      const canisterId = process.env.ASSETS_CANISTER_ID;
+      const identity = Ed25519KeyIdentity.generate(generateUint8Array(process.env.DFX_ASSET_PRINCIPAL));
+      const canisterId = process.env.STORAGE_CANISTER_ID;
       const agent = new HttpAgent({ identity });
 
       if (process.env.NODE_ENV === 'development') {
@@ -28,6 +26,12 @@ export const useAssetsStore = defineStore('assets', {
       const files = await this.assetManager.list();
 
       console.log(files);
+    },
+    async getFile(link) {
+      const asset = await this.assetManager.get(link);
+      const blob = await asset.toBlob();
+
+      return URL.createObjectURL(blob);
     },
   },
   getters: {

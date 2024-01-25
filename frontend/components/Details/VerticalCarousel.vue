@@ -22,8 +22,8 @@
               ></div>
             </div>
             <div class="counter-title">Quiz {{ currentIndex + 1 }}/{{ items.length }}</div>
-            <div v-if="newArr[currentIndex].file" class="flex items-center justify-center">
-              <img :src="newArr[currentIndex].file" alt="" width="160" height="160" />
+            <div v-if="file" class="flex items-center justify-center">
+              <img :src="file" alt="" width="160" height="160" />
             </div>
             <div class="question-title">{{ newArr[currentIndex].question }}</div>
             <div class="question-description" v-if="newArr[currentIndex].description">
@@ -96,6 +96,7 @@ const assetsStore = useAssetsStore();
 const route = useRoute();
 const counterStore = useCounterStore();
 const responseStore = useResponseStore();
+const file = ref(null);
 const props = defineProps({
   currentItem: {
     type: Object,
@@ -125,8 +126,12 @@ const cacheAnswer = computed(() => {
     return '';
   }
 });
-onMounted(() => {
+onMounted(async () => {
   newArr.value[currentIndex.value].answer = cacheAnswer.value ?? '';
+
+  if (newArr.value[currentIndex.value].file) {
+    await assetsStore.getFile(newArr.value[currentIndex.value].file).then(res => file.value = res);
+  }
 });
 const newArr = ref(
   props.items.map((item) => {

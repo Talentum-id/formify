@@ -1,10 +1,11 @@
 <template>
   <div class="head-container">
-    <div class="banner" :style="`background:url(${data.image || defaultBg})`"></div>
+    <div class="banner" :style="`background:url(${image || defaultBg})`"></div>
     <div class="info w-full">
-      <Talent text="Portal" class="ml-[-16px]" :img="data.image || defaultBg" square />
+      <Talent text="Portal" class="ml-[-16px]" :img="image || defaultBg" square />
       <div class="flex items-center gap-x-[8px]">
-        <Badge :text="formatDate(Number(data.start) * 1000)" transparent></Badge> -
+        <Badge :text="formatDate(Number(data.start) * 1000)" transparent></Badge>
+        -
         <Badge :text="formatDate(Number(data.end) * 1000)" transparent></Badge>
       </div>
       <div class="title">{{ data.title }}</div>
@@ -28,18 +29,28 @@ import Talent from '@/components/Talent.vue';
 import Badge from '@/components/Badge.vue';
 import { formatDate } from '@/util/helpers';
 import { useCounterStore } from '@/store';
-import { computed } from 'vue';
+import { useAssetsStore } from '@/store/assets';
+import { computed, onMounted, ref } from 'vue';
 import { useResponseStore } from '@/store/response';
+
+const assetsStore = useAssetsStore();
 const counterStore = useCounterStore();
 
 const step = computed(() => counterStore.getStep);
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
 });
+
+const image = ref(null);
 const answers = computed(() => useResponseStore().getResponse);
+
+onMounted(async () => {
+  await assetsStore.getFile(props.data.image).then(res => image.value = res);
+})
 </script>
 <style scoped lang="scss">
 .head-container {
@@ -52,6 +63,7 @@ const answers = computed(() => useResponseStore().getResponse);
   border-radius: 16px;
   border: 1px solid $default-border;
   background: $white;
+
   .banner {
     width: 240px;
     height: 240px;
@@ -62,6 +74,7 @@ const answers = computed(() => useResponseStore().getResponse);
     background-repeat: no-repeat !important;
     background-position: center !important;
   }
+
   .info {
     display: flex;
     flex-direction: column;
@@ -69,6 +82,7 @@ const answers = computed(() => useResponseStore().getResponse);
     gap: 24px;
     max-width: 848px;
     align-self: stretch;
+
     .title {
       color: $primary-text;
       font-family: $default_font;
@@ -78,22 +92,26 @@ const answers = computed(() => useResponseStore().getResponse);
       line-height: 64px;
       max-width: 800px;
     }
+
     .counter {
       display: flex;
       gap: 16px;
       align-items: center;
+
       .items {
         display: flex;
         padding-top: 4px;
         align-items: flex-start;
         gap: 2px;
         flex: 1 0 0;
+
         .item {
           height: 4px;
           width: 100%;
           border-radius: 4px;
           background: $default-border;
         }
+
         .active {
           background: #344054;
         }

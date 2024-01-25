@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('auth', {
     async init() {
       this.authClient = await AuthClient.create({
         idleOptions: {
-          disableIdle: true,
+          disableIdle: false,
         },
       });
 

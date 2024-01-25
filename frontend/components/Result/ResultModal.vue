@@ -4,14 +4,17 @@ import Icon from '@/components/Icons/Icon.vue';
 import Badge from '@/components/Badge.vue';
 import Variant from '@/components/Result/Variant.vue';
 import Link from '@/components/Table/Link.vue';
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useQAStore } from '@/store/qa';
 import { useResponseStore } from '@/store/response';
 import { formatDate } from '@/util/helpers';
+import { useAssetsStore } from '@/store/assets';
+
+const assetsStore = useAssetsStore();
 
 const data = computed(() => useQAStore().getQA);
 const answers = computed(() => useResponseStore().getResponse);
-console.log(data.value);
+
 defineProps({
   userInfo: {
     type: Object,
@@ -48,8 +51,12 @@ defineProps({
         </div>
         <div class="title">{{ data.description.replace(/<[^>]*>/g, '') }}</div>
         <div class="data">
-          <div>From <Link :text="userInfo.identity"></Link></div>
-          <div>Filled <Badge :text="formatDate(userInfo.filled * 1000)" type="claim"></Badge></div>
+          <div>From
+            <Link :text="userInfo.identity"></Link>
+          </div>
+          <div>Filled
+            <Badge :text="formatDate(userInfo.filled * 1000)" type="claim"></Badge>
+          </div>
         </div>
       </div>
       <div class="flex flex-col w-full gap-[16px] mt-[32px]">
@@ -58,8 +65,8 @@ defineProps({
             <div class="step">{{ idx + 1 }}/{{ data.questions.length }}</div>
             <div class="required" v-if="question.required">Required</div>
           </div>
-          <div class="w-full flex justify-center">
-            <img :src="question.image" alt="image" />
+          <div v-if="question.file" class="w-full flex justify-center">
+            <img :src="question.file" alt="image" />
           </div>
           <span class="title">{{ question.question }}</span>
           <div class="flex flex-col gap-[16px] w-full" v-if="question.answers.length">
@@ -83,14 +90,17 @@ defineProps({
 .result-wrapper {
   font-family: $default_font;
   padding: 40px;
+
   .header {
     display: flex;
     flex-direction: column;
     gap: 16px;
+
     .head-title {
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       span {
         color: $default;
         font-variant-numeric: slashed-zero;
@@ -99,10 +109,12 @@ defineProps({
         font-weight: 500;
         line-height: 40px; /* 125% */
       }
+
       .controller {
         display: flex;
         gap: 8px;
         align-items: center;
+
         .switch {
           display: flex;
           width: 32px;
@@ -116,6 +128,7 @@ defineProps({
         }
       }
     }
+
     .title {
       color: $blue;
       font-variant-numeric: lining-nums tabular-nums slashed-zero;
@@ -124,10 +137,12 @@ defineProps({
       font-weight: 500;
       line-height: 24px;
     }
+
     .data {
       display: flex;
       align-items: center;
       gap: 24px;
+
       div {
         display: flex;
         align-items: center;
@@ -142,6 +157,7 @@ defineProps({
       }
     }
   }
+
   .card {
     border-radius: 16px;
     width: 100%;
@@ -153,11 +169,13 @@ defineProps({
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
+
     .head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       width: 100%;
+
       .step {
         color: #a5acbb;
         font-variant-numeric: lining-nums tabular-nums slashed-zero;
@@ -166,6 +184,7 @@ defineProps({
         font-weight: 500;
         line-height: 24px;
       }
+
       .required {
         color: $error-border;
         font-variant-numeric: lining-nums tabular-nums slashed-zero;
@@ -176,6 +195,7 @@ defineProps({
         letter-spacing: 0.168px;
       }
     }
+
     .title {
       color: $primary-text;
       font-variant-numeric: slashed-zero;
@@ -184,6 +204,7 @@ defineProps({
       font-weight: 500;
       line-height: 24px;
     }
+
     img {
       text-align: center;
       width: 120px;

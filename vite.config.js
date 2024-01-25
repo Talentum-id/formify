@@ -7,10 +7,11 @@ import fs from 'fs';
 require('dotenv').config();
 
 const network = process.env['DFX_NETWORK'];
-const port = process.env['DFX_PORT'];
 
 const isDev = network === 'local';
 const isPlayground = network === 'playground';
+
+const DFX_PORT = isDev ? dfxJson.networks.local?.bind.split(':')[1] || process.env['DFX_PORT'] : process.env['DFX_PORT'];
 
 let canisterIds;
 try {
@@ -40,7 +41,6 @@ const canisterDefinitions = Object.entries(canisterIds).reduce(
   {},
 );
 
-const DFX_PORT = isDev ? dfxJson.networks.local.bind.split(':')[1] || port : port;
 const internetIdentityUri = isDev
   ? `http://localhost:${DFX_PORT}/?canisterId=${JSON.parse(
       canisterDefinitions['process.env.INTERNET_IDENTITY_CANISTER_ID'],
@@ -81,5 +81,6 @@ export default defineConfig({
     ...canisterDefinitions,
     'process.env.II_URI': JSON.stringify(internetIdentityUri),
     'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
+    'process.env.DFX_ASSET_PRINCIPAL': JSON.stringify(process.env.DFX_ASSET_PRINCIPAL),
   },
 });
